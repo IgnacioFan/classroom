@@ -16,7 +16,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: classroom_development_test
+  database: classroom_test
 
 production:
   <<: *default

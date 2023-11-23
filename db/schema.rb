@@ -17,10 +17,10 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_22_091927) do
   create_table "chapters", force: :cascade do |t|
     t.string "name", null: false
     t.integer "sort_key", null: false
-    t.bigint "courses_id", null: false
+    t.bigint "course_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["courses_id"], name: "index_chapters_on_courses_id"
+    t.index ["course_id"], name: "index_chapters_on_course_id"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -36,12 +36,12 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_22_091927) do
     t.string "description"
     t.text "content", null: false
     t.integer "sort_key", null: false
-    t.bigint "chapters_id", null: false
+    t.bigint "chapter_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["chapters_id"], name: "index_units_on_chapters_id"
+    t.index ["chapter_id"], name: "index_units_on_chapter_id"
   end
 
-  add_foreign_key "chapters", "courses", column: "courses_id"
-  add_foreign_key "units", "chapters", column: "chapters_id"
+  add_foreign_key "chapters", "courses"
+  add_foreign_key "units", "chapters"
 end

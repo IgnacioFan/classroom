@@ -5,7 +5,7 @@ class CreateUnits < ActiveRecord::Migration[7.1]
       t.string :description
       t.text :content, null: false
       t.integer :sort_key, null: false
-      t.references :chapters, null: false, foreign_key: true
+      t.references :chapter, null: false, foreign_key: true
       t.timestamps
     end
   end
