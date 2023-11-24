@@ -29,13 +29,8 @@ class CourseMapper
 
   def commit
     ActiveRecord::Base.transaction do 
-      @old_chapters.each do |id, chapter_attrs|
-        Chapter.update!(id, chapter_attrs)
-      end
-
-      @old_units.each do |id, unit_attrs|
-        Unit.update!(id, unit_attrs)
-      end
+      Chapter.update(@old_chapters.keys, @old_chapters.values) if @old_chapters.any?
+      Unit.update(@old_units.keys, @old_units.values) if @old_units.any?
 
       @new_chapters.each do |chapter_attrs|
         chapter = @course.chapters.build(chapter_attrs)
