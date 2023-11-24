@@ -1,9 +1,6 @@
 require "rails_helper"
 
 RSpec.describe CourseUpdater do
-  let!(:course) { create(:course, name: "JavaScript")}
-  let!(:chapter1) { create(:chapter, course: course, name: "Draft")}
-  let!(:unit1) { create(:unit, chapter: chapter1, name: "Draft")}
 
   describe "#execute" do
     let!(:course) { create(:course, name: "JavaScript")}

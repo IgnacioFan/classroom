@@ -34,4 +34,81 @@ RSpec.describe "Api::V1::Courses", type: :request do
       end
     end
   end
+
+  describe "GET /courses/:id" do
+    let!(:course) { create(:course, name: "Ruby on Rails") }
+    let!(:chapter1) { create(:chapter, course: course, sort_key: 0) }
+    let!(:chapter2) { create(:chapter, course: course, sort_key: 1) }
+    let!(:unit1) { create(:unit, chapter: chapter1, sort_key: 1) }
+    let!(:unit2) { create(:unit, chapter: chapter2, sort_key: 1) }
+
+    it "reates a new course" do
+      get "/api/v1/courses/#{course.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body, symbolize_names: true)).to eq(
+        {
+          course: {
+            id: course.id,
+            name: "Ruby on Rails",
+            lecturer: "lecturer1",
+            description: "description1",
+            chapters: [
+              {
+                id: chapter1.id, 
+                name: "chapter1", 
+                sort_key: 0, 
+                units: [
+                  { id: unit1.id, name: "unit 1", content: "unit 1 content", description: "unit 1 description", sort_key: 1 }
+                ]
+              }, 
+              { 
+                id: chapter2.id, 
+                name: "chapter2", 
+                sort_key: 1, 
+                units: [
+                  { id: unit2.id, name: "unit 2", content: "unit 2 content", description: "unit 2 description", sort_key: 1 }
+                ]
+              }
+            ]
+          }
+        }
+      )
+    end
+  end
+
+  describe "PATH /courses/:id" do
+    let!(:course) { create(:course, name: "JavaScript")}
+    let!(:chapter1) { create(:chapter, course: course, name: "Draft")}
+    let!(:unit1) { create(:unit, chapter: chapter1, name: "Draft")}
+
+    context "with valid parameters" do
+      let(:course_params) {
+        {
+          course: {
+            name: "Rails",
+            lecturer: "Test",
+            description: "test test test",
+            chapters: [
+              {
+                id: chapter1.id,
+                name: "Chapter A",
+                sort_key: 0,
+                units: [
+                  { id: unit1.id, name: "Unit A-1", description: "test 1", content: "test 1", sort_key: 0 },
+                  { id: nil, name: "Unit A-2", description: "test 2", content: "test 2", sort_key: 1 }
+                ]
+              }
+            ]
+          }
+        }
+      }
+
+      it "creates a new course" do
+        patch "/api/v1/courses/#{course.id}", params: course_params
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to eq({message: "Successfully update course, chapters, and units"}.to_json)
+      end
+    end
+  end
 end

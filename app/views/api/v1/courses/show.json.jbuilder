@@ -1,1 +1,3 @@
-json.partial! 'course', course: @course
+json.course do
+  json.partial! 'course', course: @course
+end

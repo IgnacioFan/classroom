@@ -17,7 +17,11 @@ class Api::V1::CoursesController < ApplicationController
   end
 
   def update
-    render formats: [:json]
+    # valdate course_params
+    updater = CourseUpdater.new
+    if updater.execute(params[:id], course_params)
+      render json: { message: "Successfully update course, chapters, and units" }, status: :ok 
+    end
   end
 
   def destroy
