@@ -1,8 +1,35 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Courses", type: :request do
+  
+  describe "GET /courses" do
+    let!(:courses) { create_list(:course, 25, :with_course_details) }
+
+    context "without pagination params" do
+      it 'returns courses with chapters and units' do
+        get "/api/v1/courses"
+
+        expect(response).to have_http_status(:ok)
+
+        courses = JSON.parse(response.body, symbolize_names: true)[:courses]
+        expect(courses.length).to eq(15)
+      end
+    end
+
+    context "with pagination params" do
+      it 'returns courses with chapters and units' do
+        get "/api/v1//courses", params: { page: 2, per_page: 10 }
+
+        expect(response).to have_http_status(:ok)
+        
+        courses = JSON.parse(response.body, symbolize_names: true)[:courses]
+        expect(courses.length).to eq(10)
+      end
+    end
+  end
+
   describe "POST /courses" do
-    context "with valid parameters" do
+    context "with valid params" do
       let(:course_params) {
         {
           course: {
@@ -12,7 +39,7 @@ RSpec.describe "Api::V1::Courses", type: :request do
             chapters: [
               {
                 name: "Chapter 1",
-                sort_key: 0,
+                sort_key: 1,
                 units: [
                   {
                     name: "Unit 1",
@@ -34,7 +61,7 @@ RSpec.describe "Api::V1::Courses", type: :request do
       }
 
       context "with valid params" do
-        it "resturn message and a 200 status" do
+        it "resturns message and a 200 status" do
           post "/api/v1/courses", params: course_params
           expect(response).to have_http_status(:ok)
           expect(response.body).to eq({message: "Created the course, relevant chapters, and units"}.to_json)
@@ -42,7 +69,7 @@ RSpec.describe "Api::V1::Courses", type: :request do
       end      
       
       xcontext "with invalid params" do
-        it "resturn error and a 422 status" do
+        it "resturns error and a 422 status" do
           post "/api/v1/courses", params: course_params
           expect(response).to have_http_status(422)
           # expect(response.body).to eq({message: "Created the course, relevant chapters, and units"}.to_json)
@@ -52,6 +79,8 @@ RSpec.describe "Api::V1::Courses", type: :request do
   end
 
   describe "GET /courses/:id" do
+    before { FactoryBot.rewind_sequences }
+
     let!(:course) { create(:course, name: "Ruby on Rails") }
     let!(:chapter1) { create(:chapter, course: course, sort_key: 0) }
     let!(:chapter2) { create(:chapter, course: course, sort_key: 1) }
@@ -59,7 +88,7 @@ RSpec.describe "Api::V1::Courses", type: :request do
     let!(:unit2) { create(:unit, chapter: chapter2, sort_key: 1) }
 
     context "when the course exists" do
-      it "return course info and a 200 status" do
+      it "returns course with chapters, units, and a 200 status" do
         get "/api/v1/courses/#{course.id}"
 
         expect(response).to have_http_status(:ok)
@@ -68,12 +97,12 @@ RSpec.describe "Api::V1::Courses", type: :request do
             course: {
               id: course.id,
               name: "Ruby on Rails",
-              lecturer: "lecturer1",
-              description: "description1",
+              lecturer: "lecturer 1",
+              description: "description 1",
               chapters: [
                 {
                   id: chapter1.id, 
-                  name: "chapter1", 
+                  name: "chapter 1", 
                   sort_key: 0, 
                   units: [
                     { 
@@ -87,7 +116,7 @@ RSpec.describe "Api::V1::Courses", type: :request do
                 }, 
                 { 
                   id: chapter2.id, 
-                  name: "chapter2", 
+                  name: "chapter 2", 
                   sort_key: 1, 
                   units: [
                     { 
@@ -107,10 +136,10 @@ RSpec.describe "Api::V1::Courses", type: :request do
     end
 
     context "when the course doesn't exist" do
-      it "return error message and a 404 status" do
+      it "returns error and a 404 status" do
         get "/api/v1/courses/2"
         expect(response).to have_http_status(:not_found)
-        expect(response.body).to eq({message: "Record not found"}.to_json)
+        expect(response.body).to eq({error: "Record not found"}.to_json)
       end
     end
   end
@@ -120,7 +149,7 @@ RSpec.describe "Api::V1::Courses", type: :request do
     let!(:chapter1) { create(:chapter, course: course, name: "Draft")}
     let!(:unit1) { create(:unit, chapter: chapter1, name: "Draft")}
 
-    context "with valid parameters" do
+    context "with valid params" do
       let(:course_params) {
         {
           course: {
@@ -156,13 +185,13 @@ RSpec.describe "Api::V1::Courses", type: :request do
     let!(:units) { create_list(:unit, 2, chapter: chapter)}
 
     context "when the course exists" do
-      it "return message and a 200 status" do
+      it "returns message and a 200 status" do
         delete "/api/v1/courses/#{course.id}" 
         expect(response).to have_http_status(:ok)
         expect(response.body).to eq({message: "Deleted the course, relevant chapters, and units"}.to_json)
       end
 
-      it "remove the course, relevant chapters, and units" do
+      it "removes the course, relevant chapters, and units" do
         expect{ delete "/api/v1/courses/#{course.id}" }.to \
           change(Course, :count).from(1).to(0).and \
           change(Chapter, :count).from(1).to(0).and \

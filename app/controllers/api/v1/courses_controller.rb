@@ -1,5 +1,8 @@
 class Api::V1::CoursesController < ApplicationController
+  
   def index
+    @courses = Course.includes(chapters: :units)
+    @courses = @courses.paginate(page: params[:page], per_page: per_page)
     render formats: [:json]
   end
 
@@ -7,12 +10,12 @@ class Api::V1::CoursesController < ApplicationController
     # valdate course_params
     factory = CourseFactory.new.with_params(course_params)
     if factory.execute
-      render json: { message: "Successfully create course, chapters, and units" }, status: :ok 
+      render json: { message: "Created the course, relevant chapters, and units" }, status: :ok 
     end
   end
 
   def show
-    @course = Course.preload(chapters: :units).find(params["id"])
+    @course = Course.includes(chapters: :units).find(params["id"])
     render formats: [:json]
   end
 
@@ -20,7 +23,7 @@ class Api::V1::CoursesController < ApplicationController
     # valdate course_params
     updater = CourseUpdater.new
     if updater.execute(params[:id], course_params)
-      render json: { message: "Successfully update course, chapters, and units" }, status: :ok 
+      render json: { message: "Updated the course, relevant chapters, and units" }, status: :ok 
     end
   end
 
@@ -32,6 +35,11 @@ class Api::V1::CoursesController < ApplicationController
   end
 
   private
+
+  def per_page
+    return 30 if params[:number].to_i >= 30
+    params[:number] || 15
+  end
 
   def course_params
     params
