@@ -25,7 +25,10 @@ class Api::V1::CoursesController < ApplicationController
   end
 
   def destroy
-    render formats: [:json]
+    @course = Course.find(params[:id])
+    if @course.destroy!
+      render json: { message: "Deleted the course, relevant chapters, and units" }, status: :ok 
+    end
   end
 
   private

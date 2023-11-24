@@ -111,4 +111,33 @@ RSpec.describe "Api::V1::Courses", type: :request do
       end
     end
   end
+
+  describe "DELETE /courses/:id" do
+    let!(:course) { create(:course)}
+    let!(:chapter) { create(:chapter, course: course)}
+    let!(:units) { create_list(:unit, 2, chapter: chapter)}
+
+    context "when the course exists" do
+      it "return message and 200 status" do
+        delete "/api/v1/courses/#{course.id}" 
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to eq({message: "Deleted the course, relevant chapters, and units"}.to_json)
+      end
+
+      it "remove the course, relevant chapters, and units" do
+        expect{ delete "/api/v1/courses/#{course.id}" }.to \
+          change(Course, :count).from(1).to(0).and \
+          change(Chapter, :count).from(1).to(0).and \
+          change(Unit, :count).from(2).to(0)
+      end
+    end
+
+    context "when the course doesn't exist" do
+      it "return error message and 404 status" do
+        delete "/api/v1/courses/2"
+        expect(response).to have_http_status(:not_found)
+        expect(response.body).to eq({message: "Record not found"}.to_json)
+      end
+    end
+  end
 end
