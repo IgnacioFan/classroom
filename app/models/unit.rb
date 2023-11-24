@@ -9,15 +9,19 @@
 #  sort_key    :integer          not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
-#  chapters_id :bigint           not null
+#  chapter_id  :bigint           not null
 #
 # Indexes
 #
-#  index_units_on_chapters_id  (chapters_id)
+#  index_units_on_chapter_id  (chapter_id)
 #
 # Foreign Keys
 #
-#  fk_rails_...  (chapters_id => chapters.id)
+#  fk_rails_...  (chapter_id => chapters.id)
 #
 class Unit < ApplicationRecord
+  belongs_to :chapter
+
+  validates :name, presence: true
+  validates :content, presence: true
 end
