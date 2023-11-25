@@ -32,8 +32,7 @@ RSpec.describe CourseUpdater do
         }
       }
       it "return true" do
-        res = CourseUpdater.new.execute(course.id, course_params)
-        expect(res).to eq(true)
+        expect(CourseUpdater.new(course.id, course_params).execute).to eq(true)
 
         course.reload
         expect(course.name).to eq("Ruby on Rails")
@@ -77,8 +76,7 @@ RSpec.describe CourseUpdater do
         }
       }
       it "return true" do
-        res = CourseUpdater.new.execute(course.id, course_params)
-        expect(res).to eq(true)
+        expect(CourseUpdater.new(course.id, course_params).execute).to eq(true)
 
         course.reload
         expect(course.name).to eq("Ruby on Rails")

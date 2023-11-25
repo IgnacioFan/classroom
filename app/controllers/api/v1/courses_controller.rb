@@ -19,7 +19,7 @@ class Api::V1::CoursesController < ApplicationController
   end
 
   def show
-    @course = Course.includes(chapters: :units).find(params[:id])
+    @course = Course.includes(chapters: :units).find(course_id)
     render formats: [:json]
   end
 
@@ -30,14 +30,13 @@ class Api::V1::CoursesController < ApplicationController
       return
     end
     
-    updater = CourseUpdater.new
-    if updater.execute(params[:id], course_params)
+    if CourseUpdater.new(course_id, course_params).execute
       render json: { message: "Updated the course, relevant chapters, and units" }, status: :ok 
     end
   end
 
   def destroy
-    @course = Course.find(params[:id])
+    @course = Course.find(course_id)
     if @course.destroy!
       render json: { message: "Deleted the course, relevant chapters, and units" }, status: :ok 
     end
@@ -48,6 +47,10 @@ class Api::V1::CoursesController < ApplicationController
   def per_page
     return 30 if params[:number].to_i >= 30
     params[:number] || 15
+  end
+
+  def course_id
+    params[:id].to_i
   end
 
   def course_params

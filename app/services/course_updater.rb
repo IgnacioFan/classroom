@@ -1,17 +1,20 @@
 class CourseUpdater
  
-  def initialize
+  def initialize(id, params)
+    @course_id = id
+    @course_params = params
     @course_mapper = CourseMapper.new
   end
 
-  def execute(course_id, course_params)
-    course = Course.preload(chapters: :units).find(course_id)
-    course.name = course_params[:name]
-    course.lecturer = course_params[:lecturer]
-    course.description = course_params[:description]
+  def execute
+    course = Course.preload(chapters: :units).find(@course_id)
+    course.name = @course_params[:name]
+    course.lecturer = @course_params[:lecturer]
+    course.description = @course_params[:description]
 
     @course_mapper.set_course(course)
-    course_params[:chapters].each do |chapter_params|
+
+    @course_params[:chapters].each do |chapter_params|
       update_chapter(course, chapter_params)
     end
 
