@@ -66,6 +66,13 @@ RSpec.describe "Api::V1::Courses", type: :request do
           expect(response).to have_http_status(:ok)
           expect(response.body).to eq({message: "Created the course, relevant chapters, and units"}.to_json)
         end
+
+        it "creates the course, relevant chapters, and units" do
+          expect{ post "/api/v1/courses", params: course_params }.to \
+            change(Course, :count).from(0).to(1).and \
+            change(Chapter, :count).from(0).to(1).and \
+            change(Unit, :count).from(0).to(2)
+        end
       end      
       
       xcontext "with invalid params" do
