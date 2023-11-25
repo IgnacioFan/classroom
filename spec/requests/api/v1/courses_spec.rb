@@ -60,28 +60,41 @@ RSpec.describe "Api::V1::Courses", type: :request do
         }
       }
 
-      context "with valid params" do
-        it "resturns message and a 200 status" do
-          post "/api/v1/courses", params: course_params
-          expect(response).to have_http_status(:ok)
-          expect(response.body).to eq({message: "Created the course, relevant chapters, and units"}.to_json)
-        end
+      it "resturns message and a 200 status" do
+        post "/api/v1/courses", params: course_params
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to eq({message: "Created the course, relevant chapters, and units"}.to_json)
+      end
 
-        it "creates the course, relevant chapters, and units" do
-          expect{ post "/api/v1/courses", params: course_params }.to \
-            change(Course, :count).from(0).to(1).and \
-            change(Chapter, :count).from(0).to(1).and \
-            change(Unit, :count).from(0).to(2)
-        end
-      end      
-      
-      xcontext "with invalid params" do
-        it "resturns error and a 422 status" do
-          post "/api/v1/courses", params: course_params
-          expect(response).to have_http_status(422)
-          # expect(response.body).to eq({message: "Created the course, relevant chapters, and units"}.to_json)
-        end
-      end 
+      it "creates the course, relevant chapters, and units" do
+        expect{ post "/api/v1/courses", params: course_params }.to \
+          change(Course, :count).from(0).to(1).and \
+          change(Chapter, :count).from(0).to(1).and \
+          change(Unit, :count).from(0).to(2)
+      end
+    end      
+    
+    context "with invalid params" do
+      let(:course_params) {
+        {
+          course: {
+            name: "Ruby on Rails",
+            lecturer: "New Lecturer",
+            description: "New Description",
+            chapters: [
+              {
+                name: "Chapter 1",
+                sort_key: 1
+              }
+            ]
+          }
+        }
+      }
+      it "resturns error and a 422 status" do
+        post "/api/v1/courses", params: course_params
+        expect(response).to have_http_status(:bad_request)
+        expect(response.body).to eq({error: "Chapters and units must include when create"}.to_json)
+      end
     end
   end
 

@@ -7,19 +7,29 @@ class Api::V1::CoursesController < ApplicationController
   end
 
   def create
-    # valdate course_params
+    ok, message = CourseParamsValidator.new(course_params, action_name).valid?
+    if !ok 
+      render json: { error: message }, status: :bad_request 
+      return
+    end
+    
     if CourseFactory.new(course_params).execute
       render json: { message: "Created the course, relevant chapters, and units" }, status: :ok 
     end
   end
 
   def show
-    @course = Course.includes(chapters: :units).find(params["id"])
+    @course = Course.includes(chapters: :units).find(params[:id])
     render formats: [:json]
   end
 
   def update
-    # valdate course_params
+    ok, message = CourseParamsValidator.new(course_params, action_name).valid?
+    if !ok 
+      render json: { error: message }, status: :bad_request 
+      return
+    end
+    
     updater = CourseUpdater.new
     if updater.execute(params[:id], course_params)
       render json: { message: "Updated the course, relevant chapters, and units" }, status: :ok 
