@@ -35,12 +35,10 @@ RSpec.describe CourseFactory do
     }
   }
 
-  describe "#build" do
+  describe "#execute" do
     context "when course has all required attributes" do 
       it "return course" do
-        factory = CourseFactory.new.with_params(course_params)
-        factory = factory.with_params(course_params)
-        expect(factory.execute).to eq(true)
+        expect(CourseFactory.new(course_params).execute).to eq(true)
         
         course = Course.first
         expect(course.name).to eq("Ruby on Rails")

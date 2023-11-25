@@ -1,25 +1,22 @@
 class CourseFactory
-  attr_reader :course
+  attr_reader :course_params
 
-  def initialize
-    @course = Course.build
+  def initialize(params)
+    @course_params = params
   end
 
-  def with_params(course_params)
-    @course = Course.build
-    @course.name = course_params[:name]
-    @course.lecturer = course_params[:lecturer]
-    @course.description = course_params[:description]
-
+  def execute
+    course = Course.build(
+      name: course_params[:name],
+      lecturer: course_params[:lecturer],
+      description: course_params[:description]
+    )
+    
     course_params[:chapters].each do |chapter_params|
       build_chapter(course, chapter_params)
     end
 
-    self
-  end
-
-  def execute
-    @course.save!
+    course.save!
   end
 
   private

@@ -8,8 +8,7 @@ class Api::V1::CoursesController < ApplicationController
 
   def create
     # valdate course_params
-    factory = CourseFactory.new.with_params(course_params)
-    if factory.execute
+    if CourseFactory.new(course_params).execute
       render json: { message: "Created the course, relevant chapters, and units" }, status: :ok 
     end
   end
