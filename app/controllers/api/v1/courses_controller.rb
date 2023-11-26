@@ -1,17 +1,14 @@
 class Api::V1::CoursesController < ApplicationController
-  
+  before_action :find_course, only: %i[show update]
+
   def index
-    @courses = Course.includes(chapters: :units)
-    @courses = @courses.paginate(page: params[:page], per_page: per_page)
+    @courses = Course.includes(chapters: :units).paginate(page: params[:page], per_page: per_page)
     render formats: [:json]
   end
 
   def create
-    ok, message = CourseParamsValidator.new(course_params, action_name).valid?
-    if !ok 
-      render json: { error: message }, status: :bad_request 
-      return
-    end
+    ok, message = validate_params_on_create
+    return bad_request(message) if !ok 
     
     if CourseFactory.new(course_params).execute
       render json: { message: "Created the course, relevant chapters, and units" }, status: :ok 
@@ -19,18 +16,14 @@ class Api::V1::CoursesController < ApplicationController
   end
 
   def show
-    @course = Course.includes(chapters: :units).find(course_id)
     render formats: [:json]
   end
 
   def update
-    ok, message = CourseParamsValidator.new(course_params, action_name).valid?
-    if !ok 
-      render json: { error: message }, status: :bad_request 
-      return
-    end
+    ok, message = validate_params_on_update
+    return bad_request(message) if !ok 
     
-    if CourseUpdater.new(course_id, course_params).execute
+    if CourseUpdater.new(@course, course_params).execute
       render json: { message: "Updated the course, relevant chapters, and units" }, status: :ok 
     end
   end
@@ -53,6 +46,24 @@ class Api::V1::CoursesController < ApplicationController
     params[:id].to_i
   end
 
+  def validate_params_on_create
+    CourseParamsValidator.new(course_params)
+      .validate_course_required
+      .validate_chapters_and_units_presence
+      .full_message
+  end
+
+  def validate_params_on_update
+    CourseParamsValidator.new(course_params)
+      .validate_course_required
+      .validate_chapters_and_units_missed(@course)
+      .full_message
+  end
+
+  def find_course
+    @course = Course.includes(chapters: :units).find(course_id)
+  end
+
   def course_params
     params
       .require(:course)
@@ -63,13 +74,13 @@ class Api::V1::CoursesController < ApplicationController
         chapters: [
           :id,
           :name,
-          :sort_key,
+          :_deleted,
           units: [
             :id,
             :name,
             :description,
             :content,
-            :sort_key,
+            :_deleted,
           ]
         ]
       )

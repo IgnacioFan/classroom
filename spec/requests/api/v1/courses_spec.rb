@@ -39,19 +39,16 @@ RSpec.describe "Api::V1::Courses", type: :request do
             chapters: [
               {
                 name: "Chapter 1",
-                sort_key: 1,
                 units: [
                   {
                     name: "Unit 1",
                     description: "Description 1",
-                    content: "Content 1",
-                    sort_key: 1
+                    content: "Content 1"
                   },
                   {
                     name: "Unit 2",
                     description: "Description 2",
-                    content: "Content 2",
-                    sort_key: 2
+                    content: "Content 2"
                   }
                 ]
               }
@@ -83,8 +80,7 @@ RSpec.describe "Api::V1::Courses", type: :request do
             description: "New Description",
             chapters: [
               {
-                name: "Chapter 1",
-                sort_key: 1
+                name: "Chapter 1"
               }
             ]
           }
@@ -104,8 +100,8 @@ RSpec.describe "Api::V1::Courses", type: :request do
     let!(:course) { create(:course, name: "Ruby on Rails") }
     let!(:chapter1) { create(:chapter, course: course, sort_key: 0) }
     let!(:chapter2) { create(:chapter, course: course, sort_key: 1) }
-    let!(:unit1) { create(:unit, chapter: chapter1, sort_key: 1) }
-    let!(:unit2) { create(:unit, chapter: chapter2, sort_key: 1) }
+    let!(:unit1) { create(:unit, chapter: chapter1, sort_key: 0) }
+    let!(:unit2) { create(:unit, chapter: chapter2, sort_key: 0) }
 
     context "when the course exists" do
       it "returns course with chapters, units, and a 200 status" do
@@ -130,7 +126,7 @@ RSpec.describe "Api::V1::Courses", type: :request do
                       name: "unit 1", 
                       content: "unit 1 content", 
                       description: "unit 1 description", 
-                      sort_key: 1 
+                      sort_key: 0 
                     }
                   ]
                 }, 
@@ -144,7 +140,7 @@ RSpec.describe "Api::V1::Courses", type: :request do
                       name: "unit 2", 
                       content: "unit 2 content", 
                       description: "unit 2 description", 
-                      sort_key: 1 
+                      sort_key: 0
                     }
                   ]
                 }
@@ -166,8 +162,8 @@ RSpec.describe "Api::V1::Courses", type: :request do
 
   describe "PATH /courses/:id" do
     let!(:course) { create(:course, name: "JavaScript")}
-    let!(:chapter1) { create(:chapter, course: course, name: "Draft")}
-    let!(:unit1) { create(:unit, chapter: chapter1, name: "Draft")}
+    let!(:chapter) { create(:chapter, course: course, name: "Draft")}
+    let!(:unit) { create(:unit, chapter: chapter, name: "Draft")}
 
     context "with valid params" do
       let(:course_params) {
@@ -178,12 +174,20 @@ RSpec.describe "Api::V1::Courses", type: :request do
             description: "test test test",
             chapters: [
               {
-                id: chapter1.id,
+                id: chapter.id,
                 name: "Chapter A",
-                sort_key: 0,
                 units: [
-                  { id: unit1.id, name: "Unit A-1", description: "test 1", content: "test 1", sort_key: 0 },
-                  { id: nil, name: "Unit A-2", description: "test 2", content: "test 2", sort_key: 1 }
+                  { 
+                    id: unit.id, 
+                    name: "Unit A-1", 
+                    description: "test 1", 
+                    content: "test 1"
+                  },
+                  { 
+                    name: "Unit A-2", 
+                    description: "test 2", 
+                    content: "test 2"
+                  }
                 ]
               }
             ]

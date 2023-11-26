@@ -34,7 +34,7 @@ RSpec.describe CourseUpdater do
       }
 
       it "return true" do
-        expect(CourseUpdater.new(course.id, course_params).execute).to eq(true)
+        expect(CourseUpdater.new(course, course_params).execute).to eq(true)
 
         course.reload
         expect(course).to have_attributes(
@@ -59,7 +59,7 @@ RSpec.describe CourseUpdater do
       end
 
       it "the number of chapters and units remain" do
-        expect{ CourseUpdater.new(course.id, course_params).execute }.to \
+        expect{ CourseUpdater.new(course, course_params).execute }.to \
           change(Chapter, :count).by(0).and \
           change(Unit, :count).by(0)
       end
@@ -89,11 +89,11 @@ RSpec.describe CourseUpdater do
       }
 
       it "return true" do
-        expect(CourseUpdater.new(course.id, course_params).execute).to eq(true)
+        expect(CourseUpdater.new(course, course_params).execute).to eq(true)
       end
 
       it "increase units by 1" do
-        expect{ CourseUpdater.new(course.id, course_params).execute }.to \
+        expect{ CourseUpdater.new(course, course_params).execute }.to \
           change(Chapter, :count).by(0).and \
           change(Unit, :count).from(1).to(2)
       end
@@ -128,11 +128,11 @@ RSpec.describe CourseUpdater do
       }
 
       it "returns true" do
-        expect(CourseUpdater.new(course.id, course_params).execute).to eq(true)
+        expect(CourseUpdater.new(course, course_params).execute).to eq(true)
       end
 
       it "increases the number of chapters and units" do
-        expect{ CourseUpdater.new(course.id, course_params).execute }.to \
+        expect{ CourseUpdater.new(course, course_params).execute }.to \
           change(Chapter, :count).from(1).to(2).and \
           change(Unit, :count).from(1).to(2)
       end
@@ -158,11 +158,11 @@ RSpec.describe CourseUpdater do
       }
 
       it "returns true" do
-        expect(CourseUpdater.new(course.id, course_params).execute).to eq(true)
+        expect(CourseUpdater.new(course, course_params).execute).to eq(true)
       end
 
       it "deletes the chapter and relevant units" do
-        expect{ CourseUpdater.new(course.id, course_params).execute }.to \
+        expect{ CourseUpdater.new(course, course_params).execute }.to \
           change(Chapter, :count).from(1).to(0).and \
           change(Unit, :count).from(1).to(0)
       end
@@ -188,11 +188,11 @@ RSpec.describe CourseUpdater do
       }
 
       it "return true" do
-        expect(CourseUpdater.new(course.id, course_params).execute).to eq(true)
+        expect(CourseUpdater.new(course, course_params).execute).to eq(true)
       end
 
       it "deletes the unit" do
-        expect{ CourseUpdater.new(course.id, course_params).execute }.to \
+        expect{ CourseUpdater.new(course, course_params).execute }.to \
           change(Unit, :count).from(1).to(0)
       end
     end

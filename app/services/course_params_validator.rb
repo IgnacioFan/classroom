@@ -55,12 +55,12 @@ class CourseParamsValidator
         unit_set << unit.id
       end
     end
-
+    
     course_params[:chapters]&.each do |chapter_params|
-      chapter_set.delete(chapter_params[:id])
+      chapter_set.delete(chapter_params[:id].to_i)
 
       chapter_params[:units]&.each do |unit_params|
-        unit_set.delete(unit_params[:id])
+        unit_set.delete(unit_params[:id].to_i)
       end
     end
     

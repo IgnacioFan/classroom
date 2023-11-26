@@ -2,8 +2,8 @@ class CourseUpdater
 
   attr_accessor :course, :course_params
   
-  def initialize(id, params)
-    @course = Course.preload(chapters: :units).find(id)
+  def initialize(course, params)
+    @course = course
     @course_params = params
   end
 
