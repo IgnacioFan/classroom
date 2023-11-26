@@ -1,4 +1,5 @@
 class Api::V1::CoursesController < ApplicationController
+  before_action :course_params, only: %i[create update] 
   before_action :find_course, only: %i[show update]
 
   def index
@@ -68,6 +69,7 @@ class Api::V1::CoursesController < ApplicationController
     params
       .require(:course)
       .permit(
+        :id,
         :name,
         :description,
         :lecturer,
