@@ -118,29 +118,25 @@ RSpec.describe "Api::V1::Courses", type: :request do
               chapters: [
                 {
                   id: chapter1.id, 
-                  name: "chapter 1", 
-                  sort_key: 0, 
+                  name: "chapter 1",
                   units: [
                     { 
                       id: unit1.id, 
                       name: "unit 1", 
                       content: "unit 1 content", 
-                      description: "unit 1 description", 
-                      sort_key: 0 
+                      description: "unit 1 description"
                     }
                   ]
                 }, 
                 { 
                   id: chapter2.id, 
-                  name: "chapter 2", 
-                  sort_key: 1, 
+                  name: "chapter 2",
                   units: [
                     { 
                       id: unit2.id, 
                       name: "unit 2", 
                       content: "unit 2 content", 
-                      description: "unit 2 description", 
-                      sort_key: 0
+                      description: "unit 2 description"
                     }
                   ]
                 }
