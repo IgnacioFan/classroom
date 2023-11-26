@@ -6,36 +6,35 @@ class CourseFactory
   end
 
   def execute
-    course = Course.build(
-      name: course_params[:name],
-      lecturer: course_params[:lecturer],
-      description: course_params[:description]
-    )
-    
-    course_params[:chapters].each do |chapter_params|
-      build_chapter(course, chapter_params)
-    end
-
+    course = build_course_info
     course.save!
   end
 
   private
 
-  def build_chapter(course, chapter_params)
-    chapter = course.chapters.build
-    chapter.name = chapter_params[:name]
-    chapter.sort_key = chapter_params[:sort_key]
+  def build_course_info
+    course = Course.build(
+      name: course_params[:name],
+      lecturer: course_params[:lecturer],
+      description: course_params[:description]
+    )
 
-    chapter_params[:units].each do |unit_params|
-      build_unit(chapter, unit_params)
+    course_params[:chapters].each_with_index do |chapter_params, chapter_index|
+      chapter = course.chapters.build(
+        name: chapter_params[:name],
+        sort_key: chapter_index
+      )
+      
+      chapter_params[:units].each_with_index do |unit_params, unit_index|
+        chapter.units.build(
+          name: unit_params[:name],
+          description: unit_params[:description],
+          content: unit_params[:content],
+          sort_key: unit_index
+        )
+      end
     end
-  end
 
-  def build_unit(chapter, unit_params)
-    unit = chapter.units.build
-    unit.name = unit_params[:name]
-    unit.description = unit_params[:description]
-    unit.content = unit_params[:content]
-    unit.sort_key = unit_params[:sort_key]
+    course
   end
 end
