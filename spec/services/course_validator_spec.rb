@@ -3,8 +3,13 @@ require 'rails_helper'
 RSpec.describe CourseParamsValidator do
   
   describe "#valid?" do
-    context "when create" do
-      subject { CourseParamsValidator.new(course_params, "create").valid? }
+    context "when create a course" do
+      subject { 
+        CourseParamsValidator.new(course_params)
+          .validate_course_required
+          .validate_chapters_and_units_presence
+          .full_message
+      }
 
       context "with valid params" do
         let(:course_params) {
@@ -64,10 +69,19 @@ RSpec.describe CourseParamsValidator do
       end
     end
 
-    context "when update" do
-      subject { CourseParamsValidator.new(course_params, "update").valid? }
+    context "when update the course" do
+      let!(:course) { create(:course)}
+      let!(:chapter) { create(:chapter, course: course)}
+      let!(:unit) { create(:unit, chapter: chapter)}
+      
+      subject { 
+        CourseParamsValidator.new(course_params)
+          .validate_course_required
+          .validate_chapters_and_units_missed(course)
+          .full_message
+      }
 
-      context "without units" do
+      context "with valid params" do
         let(:course_params) {
           {
             name: "Ruby on Rails",
@@ -75,7 +89,22 @@ RSpec.describe CourseParamsValidator do
             description: "New Description",
             chapters: [
               {
-                name: "Chapter 1"
+                id: chapter.id,
+                name: "Chapter 1",
+                units: [
+                  {
+                    id: unit.id,
+                    name: "Unit 1",
+                    description: "Old Description",
+                    content: "Old Content",
+                    _deleted: true
+                  },
+                  {
+                    name: "Unit 1",
+                    description: "New Description",
+                    content: "New Content"
+                  }
+                ]
               }
             ]
           }
@@ -84,16 +113,17 @@ RSpec.describe CourseParamsValidator do
         it { is_expected.to eq([true, ""]) }
       end
 
-      context "without chapters" do
+      context "with invalid params" do
         let(:course_params) {
           {
+            id: course.id,  
             name: "Ruby on Rails",
             lecturer: "New Lecturer",
             description: "New Description",
           }
         }
         
-        it { is_expected.to eq([true, ""]) }
+        it { is_expected.to eq([false, "Chapter Id (#{chapter.id}) must include\nUnit Id (#{unit.id}) must include"]) }
       end
     end
   end
