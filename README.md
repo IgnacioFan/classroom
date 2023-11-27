@@ -168,7 +168,7 @@ Comments are used to explain complex or non-intuitive code sections. Tools like 
 ## Challenges and Solutions
 
 ### Insert Many Chapters and Units 
-**Challenges**: 
+**Challenge**: 
 
 It's challenging to reduce insertion queries for chapters and units, especially when dealing with a large number of chapters and units. The current approach in `CourseFactory` results in a significant number of queries, and optimizing this process is an ongoing consideration.
 
