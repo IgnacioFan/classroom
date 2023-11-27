@@ -11,20 +11,23 @@ To run the server on your local machine, ensure that you have Ruby `3.2.0` and P
 1. Clone the repository to your local machine
 2. Navigate to the project directory.
 3. Install dependencies. 
-   ```bash
-  bundle install
-  ```
+  
+    ```bash
+    bundle install
+    ```
 
 4. Set up the database. 
-   ```bash
-   rails db:create
-   rails db:migrate
-   ```
+   
+    ```bash
+    rails db:create
+    rails db:migrate
+    ```
 
 5. start the server. 
-  ```bash
-  rails server
-  ```
+
+    ```bash
+    rails server
+    ```
 
 The API will be accessible at http://localhost:3000.
 
@@ -38,6 +41,9 @@ The API will be accessible at http://localhost:3000.
 - `annotate`: A comment summarizing the current schema.
 
 ## Project Structure
+The API server is built around the MVC pattern. When a request is received, it first goes to the controller, which handles incoming requests, invokes corresponding services to process data, and calls the view to present information in JSON format if necessary. The model defines the data structure, dependencies, and validation. The service contains data processing logics, and the view includes data presentation.
+
+All tests, including integration and unit tests, reside in the spec directory.
 
 ```
 ├── app/
@@ -53,10 +59,6 @@ The API will be accessible at http://localhost:3000.
 └── Gemfile
 ```
 
-The API server is built around the MVC pattern. When a request is received, it first goes to the controller, which handles incoming requests, invokes corresponding services to process data, and calls the view to present information in JSON format if necessary. The model defines the data structure, dependencies, and validation. The service contains data processing logics, and the view includes data presentation.
-
-All tests, including integration and unit tests, reside in the spec directory.
-
 
 ## API Endpoints Summary
 
@@ -66,12 +68,79 @@ All tests, including integration and unit tests, reside in the spec directory.
 - Create a Course Details
   - Endpoint: `POST /api/v1/courses`
   - Description: Create a course, chapters, and units in a single request.
+  - Payload example:
+
+    ```json
+    {
+      "course": {
+        "name": "Ruby on Rails",
+        "lecturer": "Test",
+        "description": "Test",
+        "chapters": [
+          {
+            "name": "Chapter A",
+            "units": [
+              {
+                "name": "Hello Word",
+                "description": "",
+                "content": "Create a Hello World"
+              }
+            ]
+          }
+        ]
+      }
+    }
+    ```
 - Get a Course Details 
   - Endpoint: `GET /api/v1/courses/:id`
   - Description: Retrieve details of a specific course, including its chapters and units.
 - Edit a Course Details
   - Endpoint: `PUT /api/v1/courses/:id`
   - Description: Update details of a specific course, including inserting or deleting chapters and units.
+  - Payload example:
+
+    ```json
+    {
+      "course": {
+        "id": 1,
+        "name": "Ruby on Rails",
+        "lecturer": "Test",
+        "description": "Test",
+        "chapters": [
+          {
+            "id": 1,
+            "name": "Chapter A",
+            "units": [
+              {
+                "id": 1,
+                "name": "Hello Word",
+                "description": "",
+                "content": "Create a Hello World"
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "name": "Chapter B",
+            "units": [
+              { // delete 
+                "id": 2,
+                "name": "Unit B-1",
+                "description": "",
+                "content": "Old content",
+                "_deleted": true 
+              },
+              { // insert
+                "name": "Unit B-1",
+                "description": "",
+                "content": "New content" 
+              }
+            ]
+          }
+        ]
+      }
+    }
+    ```
 - Delete a Course
   - Endpoint: `DELETE /api/v1/courses/:id`
   - Description: Delete a specific course, cascading down to associated chapters and units.
@@ -99,22 +168,38 @@ Comments are used to explain complex or non-intuitive code sections. Tools like 
 ## Challenges and Solutions
 
 ### Insert Many Chapters and Units 
-**Challenges**: It's challenging to reduce insertion queries for chapters and units, especially when dealing with a large number of chapters and units. The current approach in `CourseFactory` results in a significant number of queries, and optimizing this process is an ongoing consideration.
+**Challenges**: 
 
-**Solution**: Consider implementing batch inserts using the `activerecord-import` gem. Grouping chapters and units by course and executing a single bulk insert can significantly improve the insertion process.
+It's challenging to reduce insertion queries for chapters and units, especially when dealing with a large number of chapters and units. The current approach in `CourseFactory` results in a significant number of queries, and optimizing this process is an ongoing consideration.
+
+**Solution**: 
+
+Consider implementing batch inserts using the `activerecord-import` gem. Grouping chapters and units by course and executing a single bulk insert can significantly improve the insertion process.
 
 ### Update, Insert and Delete in One place
-**Challenges**: Managing update, insert, and delete operations in a single endpoint introduces complexity, especially when dealing with a large number of chapters and units for different operations. The current approach in `CourseUpdater` results in a significant number of queries.
+**Challenges**: 
 
-**Solution**: Separate the responsibilities of updating, inserting, and deleting into individual endpoints.This not only simplifies the logic but also allows for better maintainability and scalability.
+Managing update, insert, and delete operations in a single endpoint introduces complexity, especially when dealing with a large number of chapters and units for different operations. The current approach in `CourseUpdater` results in a significant number of queries.
+
+**Solution**: 
+
+Separate the responsibilities of updating, inserting, and deleting into individual endpoints.This not only simplifies the logic but also allows for better maintainability and scalability.
 
 ### Caching
-**Challenge**: Implementing caching for endpoints like `#index` and `#show` can enhance system performance, but managing data freshness and cache eviction, especially for a course details endpoint with substantial data, presents challenges.
+**Challenge**: 
 
-**Solution**: Use a time-to-live (TTL) mechanism for cache expiration. Additionally, consider LRU as cache eviction policy to avoid cold cache stays in memory for a long period of time.
+Implementing caching for endpoints like `#index` and `#show` can enhance system performance, but managing data freshness and cache eviction, especially for a course details endpoint with substantial data, presents challenges.
+
+**Solution**:
+
+Use a `TTL` for cache expiration. Additionally, consider `LRU` as cache eviction policy to avoid cold cache stays in memory for a long period of time.
 
 ### System Availabitiy
-**Challenge**: To enhance system availability, adding a load balancer to distribute traffic among multiple API servers is crucial. This ensures better fault tolerance and scalability.
+**Challenge**: 
 
-**Solution**: Integrate a load balancer into the system architecture such as NGINX to distribute incoming requests among multiple API servers. This setup improves system availability by preventing a single point of failure. Additionally, consider implementing health checks and auto-scaling to adapt to varying levels of traffic.
+To enhance system availability, adding a load balancer to distribute traffic among multiple API servers is crucial. This ensures better fault tolerance and scalability.
+
+**Solution**: 
+
+Integrate a load balancer into the system architecture such as `NGINX` to distribute incoming requests among multiple API servers. This setup improves system availability by preventing a single point of failure. Additionally, consider implementing health checks and auto-scaling to adapt to varying levels of traffic.
 
