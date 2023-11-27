@@ -193,6 +193,7 @@ RSpec.describe CourseUpdater do
 
       it "deletes the unit" do
         expect{ CourseUpdater.new(course, course_params).execute }.to \
+          change(Chapter, :count).by(0).and \
           change(Unit, :count).from(1).to(0)
       end
     end
