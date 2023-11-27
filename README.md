@@ -16,14 +16,15 @@ To run the server on your local machine, ensure that you have Ruby `3.2.0` and P
     bundle install
     ```
 
-4. Set up the database. 
+4. Create a `.env` file and set `POSTGRES_USER` and `POSTGRES_PASSWORD` 
+5. Set up the database. 
    
     ```bash
     rails db:create
     rails db:migrate
     ```
 
-5. start the server. 
+6. start the server. 
 
     ```bash
     rails server
@@ -58,7 +59,6 @@ All tests, including integration and unit tests, reside in the spec directory.
 ├── spec
 └── Gemfile
 ```
-
 
 ## API Endpoints Summary
 
