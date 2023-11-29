@@ -13,6 +13,9 @@ app.stop:
 console:
 	docker exec -it $(APP_NAME) rails console
 
+test:
+	docker exec -e "RAILS_ENV=test" $(APP_NAME) bundle exec rspec spec/
+
 db.setup:
 	docker exec -it $(APP_NAME) rails db:create && docker exec -it $(APP_NAME) rails db:migrate
 

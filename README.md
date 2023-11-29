@@ -6,6 +6,8 @@ Classroom is a streamlined web API that showcase the development of online cours
 - Rails version: 7.11
 
 ## How to run the server
+
+### Local Machine
 To run the server on your local machine, ensure that you have Ruby `3.2.0` and PostgreSQL installed.
 
 1. Clone the repository to your local machine
@@ -29,6 +31,24 @@ To run the server on your local machine, ensure that you have Ruby `3.2.0` and P
     ```bash
     rails server
     ```
+
+### Docker Compose
+To run services with docker compose. 
+
+1. Clone the repository to your local machine.
+2. Navigate to the project directory.
+3. Create a `.env` file and set the following values:
+    
+    ```dotenv
+    # postgres
+    POSTGRES_USER=?
+    POSTGRES_PASSWORD=?
+    POSTGRES_HOST=classroom-postgres
+    # rails app
+    APP_NAME=classroom-web
+    ```
+4. Execute `make app.build` to boot up Rails server and Postgres:
+5. Execute `make db.setup` to create development, test databases, and run db migration
 
 The API will be accessible at http://localhost:3000.
 
@@ -202,4 +222,3 @@ To enhance system availability, adding a load balancer to distribute traffic amo
 **Solution**: 
 
 Integrate a load balancer into the system architecture such as `NGINX` to distribute incoming requests among multiple API servers. This setup improves system availability by preventing a single point of failure. Additionally, consider implementing health checks and auto-scaling to adapt to varying levels of traffic.
-
