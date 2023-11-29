@@ -2,6 +2,9 @@ class Api::V1::CoursesController < ApplicationController
   before_action :course_params, only: %i[create update] 
   before_action :find_course, only: %i[show update]
 
+  DEFAULT_PAGE_NUM = 15
+  MAXIMUN_PAGE_NUM = 30
+
   def index
     @courses = Course.includes(chapters: :units).paginate(page: params[:page], per_page: per_page)
     render formats: [:json]
@@ -39,8 +42,8 @@ class Api::V1::CoursesController < ApplicationController
   private
 
   def per_page
-    return 30 if params[:number].to_i >= 30
-    params[:number] || 15
+    return MAXIMUN_PAGE_NUM if params[:number].to_i >= MAXIMUN_PAGE_NUM
+    params[:number] || DEFAULT_PAGE_NUM
   end
 
   def course_id
